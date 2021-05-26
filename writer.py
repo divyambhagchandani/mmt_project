@@ -40,12 +40,12 @@ def saveBookingInfo():
   # if original_broker_contact[0]['contact'] == booker_contact:
     #create to db
   query = """
-  match (booker:Users) where booker.ID = $booker_account_id
+  merge (booker:Users{ID:$booker_account_id, contact:$booker_contact}) 
   merge (traveller:Users{contact:$travellers_contact})
   create (booker)-[:BOOKER_OF{ID:$booking_id}]->(traveller)
   """
   for traveller_contact in travellers:
-    query_parameter_map = {"travellers_contact": traveller_contact, "booker_account_id": booker_account_id, "booking_id": booking_id}
+    query_parameter_map = {"travellers_contact": traveller_contact, "booker_account_id": booker_account_id, "booking_id": booking_id, "booker_contact": booker_contact}
     session.run(query,query_parameter_map)
     
   driver.close()
