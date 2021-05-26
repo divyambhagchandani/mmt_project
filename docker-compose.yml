@@ -1,0 +1,44 @@
+services:
+  neo4j:
+    container_name: neo4j
+    image: neo4j:3.5
+    restart: unless-stopped
+    #environment:
+    #  NEO4J_AUTH: "neo4j/password"
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+
+  writer:
+    container_name: writer
+    build:
+        context: ./Writer
+        dockerfile: Dockerfile
+    command: sh -c "sleep 30 && python3 writer.py"
+    restart: on-failure
+
+  reader:
+    container_name: reader
+    build:
+        context: ./Reader
+        dockerfile: Dockerfile
+    command: sh -c "sleep 30 && python3 reader.py"
+    restart: on-failure
+
+  orchestrator:
+    container_name: orchestrator
+    build:
+        context: ./Orchestrator
+        dockerfile: Dockerfile
+    command: sh -c "sleep 30 && python3 orchestrator.py"
+    ports:
+      - "8080:80"
+    restart: on-failure
