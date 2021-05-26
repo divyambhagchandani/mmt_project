@@ -29,29 +29,31 @@ def saveBookingInfo():
   
   driver = db_connection()
   session=driver.session()
-  check_query = """
-  match (n:Users{ID:$booker_account_id}) return n.contact as contact
-  """
-  check_query_parameter_map = {"booker_account_id": booker_account_id}
-  result = session.run(check_query, check_query_parameter_map)
-  original_broker_contact = result.data()
-  if original_broker_contact[0]['contact'] == booker_contact:
+  
+  # check_query = """
+  # match (n:Users{ID:$booker_account_id}) return n.contact as contact
+  # """
+  # check_query_parameter_map = {"booker_account_id": booker_account_id}
+  # result = session.run(check_query, check_query_parameter_map)
+  # original_broker_contact = result.data()
+  
+  # if original_broker_contact[0]['contact'] == booker_contact:
     #create to db
-    query = """
-    match (booker:Users) where booker.ID = $booker_account_id
-    merge (traveller:Users{contact:$travellers_contact})
-    create (booker)-[:BOOKER_OF{ID:$booking_id}]->(traveller)
-    """
-    for traveller_contact in travellers:
-      query_parameter_map = {"travellers_contact": traveller_contact, "booker_account_id": booker_account_id, "booking_id": booking_id}
-      session.run(query,query_parameter_map)
+  query = """
+  match (booker:Users) where booker.ID = $booker_account_id
+  merge (traveller:Users{contact:$travellers_contact})
+  create (booker)-[:BOOKER_OF{ID:$booking_id}]->(traveller)
+  """
+  for traveller_contact in travellers:
+    query_parameter_map = {"travellers_contact": traveller_contact, "booker_account_id": booker_account_id, "booking_id": booking_id}
+    session.run(query,query_parameter_map)
     
-    driver.close()
-    response = "Booking Information successfully saved."
+  driver.close()
+  response = "Booking Information successfully saved."
     
-  else:
-    response = "Booker account ID "+booker_account_id+" does not match with the provided booker contact details "+booker_contact+"."
-    driver.close()
+#  else:
+#     response = "Booker account ID "+booker_account_id+" does not match with the provided booker contact details "+booker_contact+"."
+#     driver.close() 
     
   
   data = {
